@@ -369,6 +369,45 @@ ashuc2
 
 ```
 
+## APp containerization 
+
+<img src="appcont1.png">
+
+### to build app image we need some knowledge 
+
+<img src="know.png">
+
+### app to image building tools 
+<img src="appb.png">
+
+### Dockerfile for python sample code 
+
+<img src="dfile.png">
+
+### 
+
+```
+ ls
+ashu.py  Dockerfile
+[ashu@ip-172-31-17-159 ashupythonapp]$ docker  build -t   ashupython:v1  .  
+Sending build context to Docker daemon  3.584kB
+Step 1/7 : FROM oraclelinux:8.4
+ ---> 97e22ab49eea
+Step 2/7 : LABEL name=ashutoshh
+ ---> Running in c0c961eb955b
+Removing intermediate container c0c961eb955b
+ ---> a3ba87cd42af
+Step 3/7 : LABEL email=ashutoshh@linux.com
+ ---> Running in 92dfc3b743c3
+Removing intermediate container 92dfc3b743c3
+ ---> d05c1bf1064e
+Step 4/7 : RUN yum install python3 -y
+ ---> Running in 5747c01d6acd
+Oracle Linux 8 BaseOS Latest (x86_64)            98 MB/s |  37 MB     00:00    
+
+
+```
+
 
 
 
