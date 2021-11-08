@@ -532,7 +532,78 @@ Successfully tagged ashupython:v3
 
 ```
 
+## HTML webapp with apache httpd containerization 
+
+<img src="httpd.png">
+
+### cloning webapp from github repo 
+
+```
+git clone https://github.com/yenchiah/project-website-template
+
+```
+
+### DOckerfile and .dockerignore 
+
+```
+FROm oraclelinux:8.4
+LABEL name=ashutoshh
+RUN yum install httpd -y 
+COPY .  /var/www/html/ 
+# everything copying to target 
+# COPY will check .dockerignore file also
+EXPOSE 80 
+ENTRYPOINT httpd -DFOREGROUND 
+# to start httpd app server 
+# NOTe: CMD & ENTRYPOINT they both are same
+# except one diff 
+# ENTRYPOINT is to set default parent process
 
 
+```
 
+### 
+
+```
+.dockerignore
+Dockerfile
+LICENSE
+.gitignore
+.git 
+README.md
+```
+
+### building image 
+
+```
+docker build -t  ashuwebapp:httpdv1 . 
+
+```
+
+### to dump image internal details 
+
+```
+ docker  inspect  ashuwebapp:httpdv1  
+[
+    {
+        "Id": "sha256:370cb606c17019da7b7b1093762ed40cc417fff66c11611d29fbce88f7fd1dec",
+        "RepoTags": [
+            "abhishwebapp:httpdv1",
+            "ashuwebapp:httpdv1",
+            "newwebapp1:httpdv1"
+```
+
+### to check build history 
+
+```
+ docker  history  ashuwebapp:httpdv1
+IMAGE          CREATED         CREATED BY                                      SIZE      COMMENT
+370cb606c170   3 minutes ago   /bin/sh -c #(nop)  ENTRYPOINT ["/bin/sh" "-c…   0B        
+76598880008d   3 minutes ago   /bin/sh -c #(nop)  EXPOSE 80                    0B        
+0a7724f0c7b8   3 minutes ago   /bin/sh -c #(nop) COPY dir:8ce968a7accf90428…   971kB     
+c3a899c78eb8   3 minutes ago   /bin/sh -c yum install httpd -y                 148MB     
+a3ba87cd42af   2 hours ago     /bin/sh -c #(nop)  LABEL name=ashutoshh         0B        
+97e22ab49eea   4 days ago      /bin/sh -c #(nop)  CMD ["/bin/bash"]            0B        
+<missing>      4 days ago      /bin/sh -c #(nop) ADD file:4ca8a2fd095830917…   246MB   
+```
 
