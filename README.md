@@ -30,3 +30,10 @@
 
 <img src="cont2.png">
 
+### Docker only have windows and linux type containers
+<img src="docker.png">
+
+### Docker Installation 
+
+<img src="dinstall.png">
+
