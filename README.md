@@ -408,6 +408,131 @@ Oracle Linux 8 BaseOS Latest (x86_64)            98 MB/s |  37 MB     00:00
 
 ```
 
+### Question 1 solution 
+
+```
+ docker run -d --name ashuc1  alpine ping google.com 
+6bdd254aed763cb78125fe0e8b959c880bed75089c66a104a59ebe50b29c18ba
+[ashu@ip-172-31-17-159 oracledockerimages]$ docker run -d --name ashuc2  alpine ping google.com 
+eb59440bebaeb6093e2a87971271e88f3b5f1a61b6d5e762786a5563df7ba366
+[ashu@ip-172-31-17-159 oracledockerimages]$ docker  exec -it ashuc1  sh 
+/ # ls
+bin    dev    etc    home   lib    media  mnt    opt    proc   root   run    sbin   srv    sys    tmp    usr    var
+/ # echo  hello world  >helloc1.txt 
+/ # ls
+bin          etc          home         media        opt          root         sbin         sys          usr
+dev          helloc1.txt  lib          mnt          proc         run          srv          tmp          var
+/ # exit
+[ashu@ip-172-31-17-159 oracledockerimages]$ docker  cp  ashuc1:/helloc1.txt  . 
+[ashu@ip-172-31-17-159 oracledockerimages]$ ls
+ashupythonapp  helloc1.txt
+[ashu@ip-172-31-17-159 oracledockerimages]$ docker  cp  helloc1.txt   ashuc2:/
+[ashu@ip-172-31-17-159 oracledockerimages]$ docker  exec -it  ashuc2 sh 
+/ # ls
+bin          etc          home         media        opt          root         sbin         sys          usr
+dev          helloc1.txt  lib          mnt          proc         run          srv          tmp          var
+/ # exit
+
+```
+
+### stop and remove all the containers 
+
+```
+80  docker kill  $(docker  ps -q)
+   81  docker  ps
+   82  docker rm  $(docker  ps -qa)
+   
+```
+
+### creating python container 
+
+```
+ docker  run  -it  -d  --name  ashuc1  ashupython:v1   
+615037799a60b1def89b438845e964d23b3e82fbd0b944f510d99f40bcf13e39
+[ashu@ip-172-31-17-159 oracledockerimages]$ docker  ps
+CONTAINER ID   IMAGE            COMMAND                  CREATED          STATUS          PORTS     NAMES
+615037799a60   ashupython:v1    "python3 /mycode/ash…"   4 seconds ago    Up 3 seconds              ashuc1
+
+```
+
+### Dockerfile 1 
+
+```
+FROM python 
+# choosing my base docker image 
+LABEL name=ashutoshh
+LABEL email=ashutoshh@linux.com 
+# optional keyword but you can share contact details 
+# incase of any assistance you can contact 
+RUN pip3 install numpy 
+# run is for getting shell access to container 
+# during image build time 
+RUN mkdir  /mycode 
+COPY  ashu.py  /mycode/ashu.py 
+# is to copy data from CLient machine to Docker engine 
+# during image build time 
+# Dockerfile and copy file both must be on same location 
+CMD ["python3", "/mycode/ashu.py"]
+# CMD is to set default parent process for any 
+# docker image
+```
+
+### building image 
+
+```
+ ls
+ashu.py  Dockerfile  Dockerfile1
+[ashu@ip-172-31-17-159 ashupythonapp]$ docker  build  -t  ashupython:v3  -f  Dockerfile1  . 
+Sending build context to Docker daemon   5.12kB
+Step 1/7 : FROM python
+latest: Pulling from library/python
+bb7d5a84853b: Pull complete 
+f02b617c6a8c: Pull complete 
+d32e17419b7e: Pull complete 
+c9d2d81226a4: Pull complete 
+3c24ae8b6604: Pull complete 
+8a4322d1621d: Pull complete 
+b777982287b6: Pull complete 
+2c5fb32d4bef: Pull complete 
+4f3be23cccd3: Pull complete 
+Digest: sha256:a487658b37559c499868dd4bdcdc6b18ed25cbfb5a02d054c9eaefaf713d5aca
+Status: Downloaded newer image for python:latest
+ ---> 4246fb19839f
+Step 2/7 : LABEL name=ashutoshh
+ ---> Running in 764b1f55dac9
+Removing intermediate container 764b1f55dac9
+ ---> ba1323b6a919
+Step 3/7 : LABEL email=ashutoshh@linux.com
+ ---> Running in 60797f0ac199
+Removing intermediate container 60797f0ac199
+ ---> 36ff7b214390
+Step 4/7 : RUN pip3 install numpy
+ ---> Running in 87bc93f1cf2e
+Collecting numpy
+  Downloading numpy-1.21.4-cp310-cp310-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (15.9 MB)
+Installing collected packages: numpy
+Successfully installed numpy-1.21.4
+WARNING: Running pip as the 'root' user can result in broken permissions and conflicting behaviour with the system package manager. It is recommended to use a virtual environment instead: https://pip.pypa.io/warnings/venv
+WARNING: You are using pip version 21.2.4; however, version 21.3.1 is available.
+You should consider upgrading via the '/usr/local/bin/python -m pip install --upgrade pip' command.
+Removing intermediate container 87bc93f1cf2e
+ ---> c0586c788797
+Step 5/7 : RUN mkdir  /mycode
+ ---> Running in ea08ed0ba18b
+Removing intermediate container ea08ed0ba18b
+ ---> 88020dafb700
+Step 6/7 : COPY  ashu.py  /mycode/ashu.py
+ ---> e24a6ed92c61
+Step 7/7 : CMD ["python3", "/mycode/ashu.py"]
+ ---> Running in caddb7a17411
+Removing intermediate container caddb7a17411
+ ---> 415400e9418e
+Successfully built 415400e9418e
+Successfully tagged ashupython:v3
+
+```
+
+
 
 
 
