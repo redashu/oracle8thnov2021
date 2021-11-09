@@ -394,4 +394,60 @@ anushab1
 ashubr2
 
 ```
+### Multi stage dockerfile demo 
+
+<img src="demo1.png">
+
+### dockerfile 
+
+```
+FROM oraclelinux:8.4  as Stage1 
+LABEL email=ashutoshh@linux.com 
+RUN yum  install java-1.8.0-openjdk.x86_64 java-1.8.0-openjdk-devel.x86_64 -y 
+RUN yum  install maven -y 
+RUN mkdir /javawebapp 
+COPY .  /javawebapp/
+WORKDIR /javawebapp
+RUN mvn clean package 
+# this step is to build java webapp -- to war file 
+#  target/WebApp.war file will be created 
+
+FROM tomcat 
+LABEL name=ashutoshh
+LABEL email=ashutoshh@linux.com 
+COPY --from=Stage1 /javawebapp/target/WebApp.war /usr/local/tomcat/webapps/
+EXPOSE 8080 
+# Note: if cmd or entrypoint is not defined then FROM image parent process will be considered
+
+```
+
+### building image 
+
+```
+docker  build  -t  ashujavaapp:v001    . 
+Sending build context to Docker daemon  14.85kB
+Step 1/13 : FROM oraclelinux:8.4  as Stage1
+ ---> 97e22ab49eea
+Step 2/13 : LABEL email=ashutoshh@linux.com
+ ---> Using cache
+ ---> 9e9c0505f6e8
+Step 3/13 : RUN yum  install java-1.8.0-openjdk.x86_64 java-1.8.0-openjdk-devel.x86_64 -y
+ ---> Running in b5e23641ce76
+Oracle Linux 8 BaseOS Latest (x86_64)           150 MB/s |  37 MB     00:00    
+Oracle Linux 8 Application Stream (x86_64)       71 MB/s |  27 MB     00:00    
+Last metadata expiration check: 0:00:08 ago on Tue Nov  9 09:59:12 2021.
+Dependencies resolved.
+================================================================================================
+ Package                       Arch    Version                          Repository          Size
+================================================================================================
+Installing:
+ java-1.8.0-openjdk            x86_64  1:1.8.0.312.b07-1.el8_4          ol8_appstream      337 k
+ java-1.8.0-openjdk-devel      x86_64  1:1.8.0.312.b
+```
+### creating container 
+
+```
+docker run -itd --name  ashucj1  -p 2211:8080  ashujavaapp:v001
+
+```
 
