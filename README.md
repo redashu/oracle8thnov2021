@@ -517,5 +517,129 @@ da1c1e7baf6d: Waiting
 
 ```
 
+## Docker Storage concept 
+
+### Storage 
+
+<img src="st.png">
+
+### COnfigure Docker engine storage 
+
+```
+[root@ip-172-31-17-159 sysconfig]# pwd
+/etc/sysconfig
+[root@ip-172-31-17-159 sysconfig]# ls
+acpid       clock     docker          irqbalance  netconsole       raid-check     rpc-rquotad  selinux
+atd         console   docker-storage  keyboard    network          rdisc          rsyncd       sshd
+authconfig  cpupower  i18n            man-db      network-scripts  readonly-root  rsyslog      sysstat
+chronyd     crond     init            modules     nfs              rpcbind        run-parts    sysstat.ioconf
+[root@ip-172-31-17-159 sysconfig]# cat  docker
+# The max number of open files for the daemon itself, and all
+# running containers.  The default value of 1048576 mirrors the value
+# used by the systemd service unit.
+DAEMON_MAXFILES=1048576
+
+# Additional startup options for the Docker daemon, for example:
+# OPTIONS="--ip-forward=true --iptables=true"
+# By default we limit the number of open files per container
+OPTIONS="--default-ulimit nofile=32768:65536 -g  /oracleDE"
+
+# How many seconds the sysvinit script waits for the pidfile to appear
+# when starting the daemon.
+DAEMON_PIDFILE_TIMEOUT=10
+[root@ip-172-31-17-159 sysconfig]# systemctl daemon-reload 
+[root@ip-172-31-17-159 sysconfig]# systemctl  restart  docker  
+[root@ip-172-31-17-159 sysconfig]# 
+
+```
+### container engine data migration 
+
+```
+ rsync -avp /var/lib/docker/  /oracleDE/
+ systemctl restart docker 
+
+```
+### COntainer are ephemral in nature 
+
+<img src="eph.png">
+
+### COntainer storage 
+
+<img src="cst.png">
+
+### docker volume 
+
+```
+$ docker  volume  ls
+DRIVER    VOLUME NAME
+[ashu@ip-172-31-17-159 oracledockerimages]$ docker  volume  create  ashuvol1 
+ashuvol1
+[ashu@ip-172-31-17-159 oracledockerimages]$ docker  volume  ls
+DRIVER    VOLUME NAME
+local     ashuvol1
+[ashu@ip-172-31-17-159 oracledockerimages]$ docker  volume  inspect  ashuvol1 
+[
+    {
+        "CreatedAt": "2021-11-09T11:18:08Z",
+        "Driver": "local",
+        "Labels": {},
+        "Mountpoint": "/oracleDE/volumes/ashuvol1/_data",
+        "Name": "ashuvol1",
+        "Options": {},
+        "Scope": "local"
+    }
+]
+[ashu@ip-172-31-17-159 oracledockerimages]$ 
+
+```
+
+### creating container with storage 
+
+```
+docker  run -itd  --name  ashuvc1  -v   ashuvol1:/newdata:rw    alpine   
+68bd6bc5a51a1fd1e7eecb0931162876534e5e52afbb3a4f57ace807c33fce42
+
+[ashu@ip-172-31-17-159 oracledockerimages]$ docker  run -itd  --name  ashuvc1  -v   ashuvol1:/newdata:rw    alpine   
+68bd6bc5a51a1fd1e7eecb0931162876534e5e52afbb3a4f57ace807c33fce42
+[ashu@ip-172-31-17-159 oracledockerimages]$ 
+[ashu@ip-172-31-17-159 oracledockerimages]$ docker  exec  -it  ashuvc1  sh 
+/ # 
+/ # 
+/ # ls
+bin      etc      lib      mnt      opt      root     sbin     sys      usr
+dev      home     media    newdata  proc     run      srv      tmp      var
+/ # cd  newdata
+/newdata # ls
+/newdata # mkdir hello mydata is here 
+/newdata # ls
+hello   here    is      mydata
+/newdata # echo hello data  >a.txt 
+sh: echho: not found
+/newdata # ls
+a.txt   hello   here    is      mydata
+/newdata # echo hello data  >a.txt 
+/newdata # ls
+a.txt   hello   here    is      mydata
+
+```
+
+### same volume to another container 
+
+```
+[ashu@ip-172-31-17-159 oracledockerimages]$ docker  run -it  --name c2  -v  ashuvol1:/hellodata:ro   oraclelinux:8.4  bash 
+[root@399969f54e3f /]# 
+[root@399969f54e3f /]# 
+[root@399969f54e3f /]# ls
+bin  boot  dev  etc  hellodata  home  lib  lib64  media  mnt  opt  proc  root  run  sbin  srv  sys  tmp  usr  var
+[root@399969f54e3f /]# cd  hellodata/
+[root@399969f54e3f hellodata]# ls
+a.txt  hello  here  is  mydata
+[root@399969f54e3f hellodata]# exit
+exit
+
+```
+
+
+
 
 
