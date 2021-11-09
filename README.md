@@ -325,3 +325,73 @@ d46b64d47296   bridge    bridge    local
 ```
 
 
+### same bridge container communication 
+
+```
+ docker  run -itd --name ashuc11 --network  ashubr1  alpine ping localhost 
+6f89db374d4883e335f30eb6d351f47cf2811f803c53fc5a1025432251e92304
+[ashu@ip-172-31-17-159 oracledockerimages]$ 
+[ashu@ip-172-31-17-159 oracledockerimages]$ 
+[ashu@ip-172-31-17-159 oracledockerimages]$ docker  run -itd --name ashuc22 --network  ashubr1  alpine ping localhost 
+c9e30565f9599b4d5d7276f2cd8bfa926173a710080f7ed084087437237427b5
+[ashu@ip-172-31-17-159 oracledockerimages]$ docker  exec -it ashuc11 sh 
+/ # ping  ashuc22
+PING ashuc22 (172.18.0.3): 56 data bytes
+64 bytes from 172.18.0.3: seq=0 ttl=255 time=0.132 ms
+64 bytes from 172.18.0.3: seq=1 ttl=255 time=0.130 ms
+64 bytes from 172.18.0.3: seq=2 ttl=255 time=0.106 ms
+^C
+--- ashuc22 ping statistics ---
+3 packets transmitted, 3 packets received, 0% packet loss
+round-trip min/avg/max = 0.106/0.122/0.132 ms
+/ # exit
+
+```
+
+### Custom subnet with docker networking 
+
+```
+docker  network  create  ashubr2  --subnet  192.168.1.0/24 
+585c6e3344fbce01956a50c287513fb5d91d61943a2b76d72f5f2192575b611d
+[ashu@ip-172-31-17-159 oracledockerimages]$ docker  run -itd --name ashuc33  --network  ashubr2 alpine 
+95f9357485ebced28919fb299617acc8edb101a8d4c98425891e73d1369c43bc
+[ashu@ip-172-31-17-159 oracledockerimages]$ 
+[ashu@ip-172-31-17-159 oracledockerimages]$ 
+[ashu@ip-172-31-17-159 oracledockerimages]$ docker  run -itd --name ashuc44  --network  ashubr2 --ip   192.1681.1.100  alpine 
+docker: Error response from daemon: invalid IPv4 address: 192.1681.1.100.
+See 'docker run --help'.
+[ashu@ip-172-31-17-159 oracledockerimages]$ docker  run -itd --name ashuc44  --network  ashubr2 --ip   192.168.1.100  alpine 
+89cace97ff394b2f9149877b47f5bb6e97ea28aefcf537286e7c1757b838c18f
+[ashu@ip-172-31-17-159 oracledockerimages]$ docker  exec  -it  ashuc33 sh 
+/ # ping  ashuc44
+PING ashuc44 (192.168.1.100): 56 data bytes
+64 bytes from 192.168.1.100: seq=0 ttl=255 time=0.106 ms
+64 bytes from 192.168.1.100: seq=1 ttl=255 time=0.088 ms
+64 bytes from 192.168.1.100: seq=2 ttl=255 time=0.076 ms
+64 bytes from 192.168.1.100: seq=3 ttl=255 time=0.085 ms
+64 bytes from 192.168.1.100: seq=4 ttl=255 time=0.082 ms
+^C
+--- ashuc44 ping statistics ---
+5 packets transmitted, 5 packets received, 0% packet loss
+round-trip min/avg/max = 0.076/0.087/0.106 ms
+/ # exit
+[ashu@ip-172-31-17-159 oracledockerimages]$ 
+
+```
+
+### remove all the networking 
+
+```
+
+[ashu@ip-172-31-17-159 oracledockerimages]$ docker  network prune 
+WARNING! This will remove all custom networks not used by at least one container.
+Are you sure you want to continue? [y/N] y
+Deleted Networks:
+rajubr1
+anithabr1
+advbr1
+anushab1
+ashubr2
+
+```
+
