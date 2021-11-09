@@ -421,6 +421,18 @@ EXPOSE 8080
 
 ```
 
+### .dockerignore file 
+
+```
+Dockerfile
+.dockerignore
+*.old
+*.sh
+*.md
+.git
+
+```
+
 ### building image 
 
 ```
@@ -450,4 +462,39 @@ Installing:
 docker run -itd --name  ashucj1  -p 2211:8080  ashujavaapp:v001
 
 ```
+
+### Image pushing to OCR 
+
+```
+ docker  tag   ashujavaapp:v001   phx.ocir.io/axmbtg8judkl/javawebapp:v1   
+[ashu@ip-172-31-17-159 webapp]$ 
+[ashu@ip-172-31-17-159 webapp]$ 
+[ashu@ip-172-31-17-159 webapp]$ docker login  phx.ocir.io  
+Username: axmbtg8judkl/learntechbyme@gmail.com
+Password: 
+WARNING! Your password will be stored unencrypted in /home/ashu/.docker/config.json.
+Configure a credential helper to remove this warning. See
+https://docs.docker.com/engine/reference/commandline/login/#credentials-store
+
+Login Succeeded
+[ashu@ip-172-31-17-159 webapp]$ 
+[ashu@ip-172-31-17-159 webapp]$ docker  push  phx.ocir.io/axmbtg8judkl/javawebapp:v1 
+The push refers to repository [phx.ocir.io/axmbtg8judkl/javawebapp]
+8f541a2b0ee6: Pushed 
+450346f29d28: Pushed 
+5122793ce9cb: Pushed 
+cb80689c9aef: Pushed 
+78700b6b35d0: Pushed 
+62a5b8741e83: Pushed 
+36e0782f1159: Pushed 
+ba6e5ff31f23: Pushed 
+9f9f651e9303: Pushed 
+0b3c02b5d746: Pushed 
+62a747bf1719: Pushed 
+v1: digest: sha256:85e3f00e258e32efbc7f33a0e0385d23102eb303181326b614d0214fa9a5c4a8 size: 2630
+[ashu@ip-172-31-17-159 webapp]$ docker logout  phx.ocir.io 
+Removing login credentials for phx.ocir.io
+
+```
+
 
