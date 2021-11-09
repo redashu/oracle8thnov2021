@@ -497,4 +497,25 @@ Removing login credentials for phx.ocir.io
 
 ```
 
+### to PUll any private registry image 
+
+```
+ docker  login  phx.ocir.io  -u  axmbtg8judkl/learntechbyme@gmail.com     
+Password: 
+Login Succeeded
+ fire@ashutoshhs-MacBook-Air  ~  
+ fire@ashutoshhs-MacBook-Air  ~  
+ fire@ashutoshhs-MacBook-Air  ~  docker  pull  phx.ocir.io/axmbtg8judkl/javawebapp:v1                 
+v1: Pulling from axmbtg8judkl/javawebapp
+bb7d5a84853b: Downloading [=>                                                 ]  2.124MB/54.92MB
+f02b617c6a8c: Downloading [=======================>                           ]  2.468MB/5.153MB
+d32e17419b7e: Downloading [=============>                                     ]  2.984MB/10.87MB
+c9d2d81226a4: Waiting 
+fab4960f9cd2: Waiting 
+da1c1e7baf6d: Waiting 
+1d2ade66c57e: Waiting 
+
+```
+
+
 
