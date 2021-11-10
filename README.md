@@ -410,4 +410,58 @@ Step 6/6 : ENTRYPOINT httpd -DFOREGROUND
  [ashutoshh] (https://github.com/redashu/docker-compose)
  
  
+ ### problem with docker engine incase of app deployment in prod env 
  
+ <img src="prob.png">
+ 
+ ## COntainer management or container orchestration engine or tools 
+ 
+ <img src="carch.png">
+ 
+ ## Understanding k8s arch  
+ 
+ ### LEvel 1 
+ 
+ <img src="l1.png">
+ 
+ ### kube-apiserver and kubelet (agent) of minion 
+ 
+ <img src="api.png">
+ 
+ ### k8s installation methods 
+ 
+ <img src="install.png">
+ 
+ ### Installing kubectl in client machine 
+ 
+ ### Download apiserver auth file to interact 
+ 
+ <img src="auth.png">
+ 
+ ### checking client side 
+ 
+ ```
+ kubectl  version  --kubeconfig admin.conf.txt 
+Client Version: version.Info{Major:"1", Minor:"21", GitVersion:"v1.21.1", GitCommit:"5e58841cce77d4bc13713ad2b91fa0d961e69192", GitTreeState:"clean", BuildDate:"2021-05-12T14:18:45Z", GoVersion:"go1.16.4", Compiler:"gc", Platform:"darwin/amd64"}
+Server Version: version.Info{Major:"1", Minor:"22", GitVersion:"v1.22.3", GitCommit:"c92036820499fedefec0f847e2054d824aea6cd1", GitTreeState:"clean", BuildDate:"2021-10-27T18:35:25Z", GoVersion:"go1.16.9", Compiler:"gc", Platform:"linux/amd64"}
+
+```
+
+### getting nodes details 
+
+```
+ kubectl  get  nodes    --kubeconfig admin.conf.txt
+NAME            STATUS   ROLES                  AGE     VERSION
+control-plane   Ready    control-plane,master   6h29m   v1.22.3
+node1           Ready    <none>                 6h28m   v1.22.3
+node2           Ready    <none>                 6h28m   v1.22.3
+
+```
+
+###  api Server to ETCD 
+
+<img src="etcd.png">
+
+
+
+
