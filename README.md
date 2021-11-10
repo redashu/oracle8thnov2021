@@ -463,5 +463,149 @@ node2           Ready    <none>                 6h28m   v1.22.3
 <img src="etcd.png">
 
 
+### Intro to POD in k8s 
+
+<img src="pod.png">
+
+### a closure look to POD 
+
+<img src="Pod1.png">
+
+### POd example 1
+
+```
+apiVersion: v1 
+kind: Pod 
+metadata: # info about pod 
+ name: ashupod-1  # name of pod 
+spec: # info about application 
+ containers:
+ - name: ashuc1 # name of container 
+   image: alpine # image from docker hub 
+   command: ["sh","-c","ping localhost"] # parent process
+ 
+```
+
+### checking syntax of yaml without deploying it 
+
+```
+ kubectl  apply -f  ashupod1.yaml --dry-run=client
+pod/ashupod-1 created (dry run)
+
+```
+
+### deploy pod and check 
+
+```
+ kubectl  apply -f  ashupod1.yaml                 
+pod/ashupod-1 created
+ fire@ashutoshhs-MacBook-Air  ~/Desktop/k8s_apps  kubectl  get  pods 
+NAME        READY   STATUS              RESTARTS   AGE
+ashupod-1   1/1     Running             0          13s
+prepod-1    0/1     ContainerCreating   0          1s
+
+```
+
+###  kube-schedular 
+
+<img src="sch.png">
+
+### checking minion node for the POD 
+
+```
+kubectl  get  pods  ashupod-1  -o wide
+NAME        READY   STATUS    RESTARTS   AGE     IP                NODE    NOMINATED NODE   READINESS GATES
+ashupod-1   1/1     Running   0          7m32s   192.168.166.135   node1   <none>           <none>
+
+```
+
+###
+
+```
+ kubectl  get  pods   -o wide          
+NAME          READY   STATUS    RESTARTS   AGE     IP                NODE    NOMINATED NODE   READINESS GATES
+abhishpod1    1/1     Running   0          7m28s   192.168.104.10    node2   <none>           <none>
+amitpod-1     1/1     Running   0          7m40s   192.168.166.137   node1   <none>           <none>
+anithapod-1   1/1     Running   0          7m54s   192.168.104.8     node2   <none>           <none>
+anushapod-1   1/1     Running   0          6m55s   192.168.166.138   node1   <none>           <none>
+archana       1/1     Running   0          4m9s    192.168.166.139   node1   <none>           <none>
+ashupod-1     1/1     Running   0          8m29s   192.168.166.135   node1   <none>           <none>
+dhanupod-1    1/1     Running   0          6m54s   192.168.104.11    node2   <none>           <none>
+nitinpod-1    1/1     Running   0          7m56s   192.168.166.136   node1   <none>           <none>
+
+```
+
+### max info about pod 
+
+```
+kubectl describe pod ashupod-1
+Name:         ashupod-1
+Namespace:    default
+Priority:     0
+Node:         node1/172.31.31.235
+Start Time:   Wed, 10 Nov 2021 16:43:00 +0530
+Labels:       <none>
+Annotations:  cni.projectcalico.org/containerID: a115caca690efebdb92fa73bf1819b74a6a1a1f645861a050e995aba7c34f642
+              cni.projectcalico.org/podIP: 192.168.166.135/32
+              cni.projectcalico.org/podIPs: 192.168.166.135/32
+Status:       Running
+IP:           192.168.166.135
+IPs:
+  IP:  192.168.166.135
+Containers:
+  ashuc1:
+    Container ID:  docker://7758b0fb9a5500d9ffb520150367aecfd05724984679be83dbe623ec41f83683
+    Image:         alpine
+    
+```
+
+### checking output of pod container 
+
+```
+ kubectl logs -f  ashupod-1 
+ 
+```
+
+### access container inside pod 
+
+```
+kubectl  exec -it  ashupod-1   -- sh 
+/ # 
+/ # 
+/ # 
+/ # cat  /etc/os-release 
+NAME="Alpine Linux"
+ID=alpine
+VERSION_ID=3.14.2
+PRETTY_NAME="Alpine Linux v3.14"
+HOME_URL="https://alpinelinux.org/"
+BUG_REPORT_URL="https://bugs.alpinelinux.org/"
+/ # ps -e
+PID   USER     TIME  COMMAND
+    1 root      0:00 ping localhost
+    7 root      0:00 sh
+   17 root      0:00 ps -e
+/ # exit
+
+```
+
+### Deleting pod 
+
+```
+kubectl delete pod ashupod-1
+pod "ashupod-1" deleted
+
+ fire@ashutoshhs-MacBook-Air  ~/Desktop/k8s_apps  
+ fire@ashutoshhs-MacBook-Air  ~/Desktop/k8s_apps  kubectl delete pod  --all   
+pod "abhishpod1" deleted
+pod "amitpod-1" deleted
+pod "anithapod-1" deleted
+pod "anushapod-1" deleted
+pod "archana" deleted
+pod "dhanupod-1" deleted
+pod "nitinpod-1" deleted
+
+```
+
 
 
