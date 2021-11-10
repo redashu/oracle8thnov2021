@@ -155,5 +155,17 @@ mysql> show databases;
 
 ```
 
+### docker webuI using portainer 
+
+```
+docker  run -itd  --restart  always  -p 9000:9000 -v  /var/run/docker.sock:/var/run/docker.sock  portainer/portainer 
+Unable to find image 'portainer/portainer:latest' locally
+latest: Pulling from portainer/portainer
+94cfa856b2b1: Pull complete 
+49d59ee0881a: Pull complete 
+a2300fd28637: Pull complete 
+
+```
+
 
 
