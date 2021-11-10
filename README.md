@@ -77,5 +77,83 @@ root                14883               9503                0                   
   
 ```
 
+### Docker volume more details 
+
+<img src="dvol.png">
+
+### deploy mysql db container 
+
+<img src="db.png">
+
+### db container 
+
+```
+docker  run -itd --name ashudbc1 -e MYSQL_ROOT_PASSWORD=oracleTr088  -v /home/ashu/oracledockerimages/dbdata:/var/lib/mysql/     mysql
+
+```
+
+### check logs of db container 
+
+```
+ docker logs -f ashudbc1
+2021-11-10 05:41:02+00:00 [Note] [Entrypoint]: Entrypoint script for MySQL Server 8.0.27-1debian10 started.
+2021-11-10 05:41:02+00:00 [Note] [Entrypoint]: Switching to dedicated user 'mysql'
+2021-11-10 05:41:02+00:00 [Note] [Entrypoint]: Entrypoint script for MySQL Server 8.0.27-1debian10 started.
+2021-11-10 05:41:03+00:00 [Note] [Entrypoint]: Initializing database files
+2021-11-10T05:41:03.066775Z 0 [System] [MY-013169] [Server] /usr/sbin/mysqld (m
+
+21-11-10T05:41:30.741348Z 0 [System] [MY-010931] [Server] /usr/sbin/mysqld: ready for connections. Version: '8.0.27'  socket: '/var/run/mysqld/mysqld.sock'  port: 3306  MySQL Community Server - GPL.
+^C
+
+```
+
+### checking details of db container 
+
+```
+docker  exec -it  ashudbc1  bash 
+root@6e6d000e8f5a:/# 
+root@6e6d000e8f5a:/# cat  /etc/os-release 
+PRETTY_NAME="Debian GNU/Linux 10 (buster)"
+NAME="Debian GNU/Linux"
+VERSION_ID="10"
+VERSION="10 (buster)"
+VERSION_CODENAME=buster
+ID=debian
+HOME_URL="https://www.debian.org/"
+SUPPORT_URL="https://www.debian.org/support"
+BUG_REPORT_URL="https://bugs.debian.org/"
+
+```
+
+### connecting to db server 
+
+```
+root@6e6d000e8f5a:/# mysql -u root -p 
+Enter password: 
+Welcome to the MySQL monitor.  Commands end with ; or \g.
+Your MySQL connection id is 8
+Server version: 8.0.27 MySQL Community Server - GPL
+
+Copyright (c) 2000, 2021, Oracle and/or its affiliates.
+
+Oracle is a registered trademark of Oracle Corporation and/or its
+affiliates. Other names may be trademarks of their respective
+owners.
+
+Type 'help;' or '\h' for help. Type '\c' to clear the current input statement.
+
+mysql> show databases;
++--------------------+
+| Database           |
++--------------------+
+| information_schema |
+| mysql              |
+| performance_schema |
+| sys                |
++--------------------+
+4 rows in set (0.01 sec)
+
+```
+
 
 
