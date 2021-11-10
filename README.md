@@ -167,5 +167,247 @@ a2300fd28637: Pull complete
 
 ```
 
+### Docker compose Introduction 
+
+<img sr="dc.png">
+
+### Install docker compose 
+
+[Link](https://docs.docker.com/compose/install/)
+
+## snap 
+
+<img src="dci.png">
+
+### checking compose 
+
+```
+docker-compose  -v
+docker-compose version 1.29.2, build 5becea4c
+[ashu@ip-172-31-17-159 oracledockerimages]$ docker-compose  version 
+docker-compose version 1.29.2, build 5becea4c
+docker-py version: 5.0.0
+CPython version: 3.7.10
+OpenSSL version: OpenSSL 1.1.0l  10 Sep 2019
+
+```
+
+### compsoe file info 
+
+<img src="composef.png">
+
+### Example 1. 
+
+```
+version: '3.8' # compsoe file version 
+services: # for container apps 
+ ashuapp1: # name of application 
+  image: alpine
+  container_name: ashuc1
+  command: ping localhost # parent process
+  restart: always # restart policy 
+
+```
+
+### deploy 
+
+```
+ cd  ashutoshhcompose/
+[ashu@ip-172-31-17-159 ashutoshhcompose]$ ls
+docker-compose.yaml
+[ashu@ip-172-31-17-159 ashutoshhcompose]$ docker-compose up -d 
+Creating network "ashutoshhcompose_default" with the default driver
+Creating ashuc1 ... done
+[ashu@ip-172-31-17-159 ashutoshhcompose]$ docker-compose  ps
+ Name       Command       State   Ports
+---------------------------------------
+ashuc1   ping localhost   Up           
+[ashu@ip-172-31-17-159 ashutoshhcompose]$ 
+
+```
+
+### compose more commands 
+
+```
+[ashu@ip-172-31-17-159 ashutoshhcompose]$ ls
+docker-compose.yaml
+[ashu@ip-172-31-17-159 ashutoshhcompose]$ docker-compose  ps
+ Name       Command       State   Ports
+---------------------------------------
+ashuc1   ping localhost   Up           
+[ashu@ip-172-31-17-159 ashutoshhcompose]$ docker-compose  stop
+Stopping ashuc1 ... done
+[ashu@ip-172-31-17-159 ashutoshhcompose]$ docker-compose  ps
+ Name       Command        State     Ports
+------------------------------------------
+ashuc1   ping localhost   Exit 137        
+[ashu@ip-172-31-17-159 ashutoshhcompose]$ docker-compose  start
+Starting ashuapp1 ... done
+[ashu@ip-172-31-17-159 ashutoshhcompose]$ docker-compose  kill
+Killing ashuc1 ... done
+[ashu@ip-172-31-17-159 ashutoshhcompose]$ docker-compose  rm 
+Going to remove ashuc1
+Are you sure? [yN] y
+Removing ashuc1 ... done
+[ashu@ip-172-31-17-159 ashutoshhcompose]$ docker-compose  up -d
+Creating ashuc1 ... done
+[ashu@ip-172-31-17-159 ashutoshhcompose]$ docker-compose  ps
+ Name       Command       State   Ports
+---------------------------------------
+ashuc1   ping localhost   Up    
+
+```
+
+### for complete removal 
+
+```
+docker-compose  down 
+Stopping ashuc1 ... done
+Removing ashuc1 ... done
+Removing network ashutoshhcompose_default
+
+```
+
+### example 2 
+
+```
+version: '3.8' # compsoe file version 
+services: # for container apps 
+ ashudbapp: # db container app 
+  image: mysql 
+  container_name: ashudbc1 
+  restart: always 
+  environment:
+   MYSQL_ROOT_PASSWORD: "oracleTr088#" 
+ ashuapp2: # second app 
+  image: dockerashu/oraclejava:v1 
+  container_name: ashuc2 
+  ports: # port forwarding 
+   - 3344:8080 
+  restart: always 
+ ashuapp1: # name of application 
+  image: alpine
+  container_name: ashuc1
+  command: ping localhost # parent process
+  restart: always # restart policy 
+
+```
 
 
+### deploy 
+
+```
+ docker-compose -f multicont.yaml up -d 
+Creating network "ashutoshhcompose_default" with the default driver
+Pulling ashuapp2 (dockerashu/oraclejava:v1)...
+v1: Pulling from dockerashu/oraclejava
+a4df6f21af84: Extracting [================================>                  ]  57.93MB/90.3a4df6f21af84: Extracting [================================>                  ]  59.05MB/90.3a4df6f21af84: Extracting [================================>                  ]   59.6MB/90.3a4df6f21af84: Extracting [=================================>                 ]  60.72MB/90.3a4df6f21af84: Extracting [==================================>                ]  62.39MB/90.3a4df6f21af84: Pull complete05a782d6950e: Pull completeff12b7ec20b9: Pull completeDigest: sha256:f6df93895957d5302d8ac19bdd904a28e14d01a3f5e0f8869daddc6a39fe0108
+Status: Image is up to date for dockerashu/oraclejava:v1
+Creating ashuc1   ... done
+Creating ashuc2   ... done
+Creating ashudbc1 ... done
+```
+
+### few more compose operations 
+
+```
+ 460  docker-compose -f multicont.yaml  stop 
+  461  docker-compose -f multicont.yaml  ps
+  462  docker-compose -f multicont.yaml  start   ashuapp1
+  463  docker-compose -f multicont.yaml  ps
+  464  docker-compose -f multicont.yaml  kill  ashuapp1
+  465  docker-compose -f multicont.yaml  start
+  466  docker-compose -f multicont.yaml  ps
+  467  docker-compose -f multicont.yaml  stop  ashuapp1 
+  468  docker-compose -f multicont.yaml  ps
+  
+ ```
+ 
+ ### example 3 
+ 
+ ```
+ version: '3.8'
+networks: # to create network bridge 
+ ashubr1: # name of bridge 
+volumes: # to create volume 
+ ashudbvol1:  # name of volume 
+services:
+ ashudbapp: # name of service 
+  image: mysql
+  container_name: ashudbc111 
+  restart: always 
+  environment: 
+   MYSQL_ROOT_PASSWORD: "Hellodbc1##"
+  volumes: # to mount volume created above 
+   - "ashudbvol1:/var/lib/mysql/"
+  networks: # to use above created network 
+   - ashubr1  
+ 
+ ```
+ 
+ ### demo deploy 
+ 
+ ```
+  docker-compose -f db.yaml up -d  
+Creating network "ashutoshhcompose_ashubr1" with the default driver
+Creating volume "ashutoshhcompose_ashudbvol1" with default driver
+Creating ashudbc111 ... done
+[ashu@ip-172-31-17-159 ashutoshhcompose]$ docker-compose -f db.yaml  ps
+   Name                Command             State          Ports       
+----------------------------------------------------------------------
+ashudbc111   docker-entrypoint.sh mysqld   Up      3306/tcp, 33060/tcp
+[ashu@ip-172-31-17-159 ashutoshhcompose]$ 
+ 
+ ```
+ 
+### Container with build image 
+
+
+### example 4 
+
+```
+version: '3.8'
+services:
+ ashuwebapp: 
+  image: dockerashu/webapp:v111 
+  build:  # calling dockerfile from current location 
+   context: . # location of dockerfile 
+   dockerfile: httpd.dockerfile  # name of dockerfile 
+  container_name: ashuwebc1
+  ports:
+   - 6644:80 
+  restart: always 
+
+```
+
+
+# demo 
+```
+docker-compose up --build -d 
+Building ashuwebapp
+Sending build context to Docker daemon  1.005MB
+Step 1/6 : FROm oraclelinux:8.4
+ ---> 97e22ab49eea
+Step 2/6 : LABEL name=ashutoshh
+ ---> Using cache
+ ---> 1710c35a393b
+Step 3/6 : RUN yum install httpd -y
+ ---> Using cache
+ ---> 05741b493c7f
+Step 4/6 : COPY .  /var/www/html/
+ ---> 36a374199ae8
+Step 5/6 : EXPOSE 80
+ ---> Running in 64a7d301043a
+Removing intermediate container 64a7d301043a
+ ---> 3339e865c7da
+Step 6/6 : ENTRYPOINT httpd -DFOREGROUND
+ ---> Running in 9e2b4116dbf4
+ 
+ ```
+ 
+ ### compose file link git repo 
+ 
+ [ashutoshh] (https://github.com/redashu/docker-compose)
+ 
+ 
+ 
