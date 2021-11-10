@@ -64,4 +64,18 @@ root                14883               9503                0                   
   
 ```
 
+## remove all data of docker engine 
+
+```
+ 378  docker  rm $(docker ps -aq) -f
+  379  docker rmi $(docker  images -q) -f
+  380  history 
+  381  docker  images 
+  382  docker  ps -a
+  383  docker network prune 
+  384  docker volume rm $(docker  volume ls -q)
+  
+```
+
+
 
