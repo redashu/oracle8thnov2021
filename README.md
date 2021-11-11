@@ -140,4 +140,162 @@ CURRENT   NAME                          CLUSTER      AUTHINFO           NAMESPAC
  
  ```
  
+ ### pod from diff minion node can connect to each other 
  
+ ```
+ kubectl  get  po -o wide -n tasks 
+NAME            READY   STATUS    RESTARTS   AGE   IP                NODE    NOMINATED NODE   READINESS GATES
+amitpod1        1/1     Running   0          23m   192.168.166.168   node1   <none>           <none>
+anushapod1      1/1     Running   0          48m   192.168.104.33    node2   <none>           <none>
+archanapod1     1/1     Running   0          51m   192.168.166.163   node1   <none>           <none>
+ashupod1        1/1     Running   0          37m   192.168.166.167   node1   <none>           <none>
+dhanushpod1     1/1     Running   0          33m   192.168.104.42    node2   <none>           <none>
+gauravbusybox   1/1     Running   0          29m   192.168.104.43    node2   <none>           <none>
+pavanipod1      1/1     Running   0          43m   192.168.166.166   node1   <none>           <none>
+rajutask        1/1     Running   0          53m   192.168.104.32    node2   <none>           <none>
+ fire@ashutoshhs-MacBook-Air  ~/Desktop/k8s_apps  kubectl exec  -it  amitpod1 -n tasks -- sh 
+/ # ping 192.168.104.33
+PING 192.168.104.33 (192.168.104.33): 56 data bytes
+64 bytes from 192.168.104.33: seq=0 ttl=253 time=0.516 ms
+64 bytes from 192.168.104.33: seq=1 ttl=253 time=0.327 ms
+
+```
+### POd Networking with calico CNI 
+
+<img src="cni.png">
+
+### creating webapp POD yaml 
+
+```
+kubectl  run  ashuweb  --image=dockerashu/nginx:11nov2021   --port 80 --dry-run=client -o yaml 
+apiVersion: v1
+kind: Pod
+metadata:
+  creationTimestamp: null
+  labels:
+    run: ashuweb
+  name: ashuweb
+spec:
+  containers:
+  - image: dockerashu/nginx:11nov2021
+    name: ashuweb
+    ports:
+    - containerPort: 80
+    resources: {}
+  dnsPolicy: ClusterFirst
+  restartPolicy: Always
+status: {}
+ fire@ashutoshhs-MacBook-Air  ~/Desktop/k8s_apps  kubectl  run  ashuweb  --image=dockerashu/nginx:11nov2021   --port 80 --dry-run=client -o yaml  >nginxapp.yaml 
+ 
+ ```
+ 
+ ### deploy webapp using pod 
+ 
+ ```
+  kubectl apply -f  nginxapp.yaml 
+pod/ashuweb created
+ fire@ashutoshhs-MacBook-Air  ~/Desktop/k8s_apps  kubectl  get po 
+NAME      READY   STATUS    RESTARTS   AGE
+ashuweb   1/1     Running   0          6s
+ fire@ashutoshhs-MacBook-Air  ~/Desktop/k8s_apps  kubectl  get po -o wide
+NAME      READY   STATUS    RESTARTS   AGE   IP               NODE    NOMINATED NODE   READINESS GATES
+ashuweb   1/1     Running   0          12s   192.168.104.45   node2   <none>           <none>
+
+```
+
+### access app locally 
+
+```
+kubectl  get  po 
+NAME      READY   STATUS    RESTARTS   AGE
+ashuweb   1/1     Running   0          6m2s
+ fire@ashutoshhs-MacBook-Air  ~/Desktop/k8s_apps  kubectl  port-forward  1122:80  ashuweb 
+Error from server (NotFound): pods "1122:80" not found
+ ✘ fire@ashutoshhs-MacBook-Air  ~/Desktop/k8s_apps  kubectl  port-forward  ashuweb  1122:80 
+Forwarding from 127.0.0.1:1122 -> 80
+Forwarding from [::1]:1122 -> 80
+Handling connection for 1122
+Handling connection for 1122
+^C%                                                                
+
+```
+
+### Internal Loadbalancer for k8s 
+
+<img src="lb.png">
+
+## Loadbalancer 
+
+<img src="lb1.png">
+
+### Intro to service 
+
+<img src="svc1.png">
+
+## checking label of POD 
+
+```
+ kubectl apply -f  nginxapp.yaml 
+pod/ashuweb configured
+ fire@ashutoshhs-MacBook-Air  ~/Desktop/k8s_apps  kubectl  get po --show-labels 
+NAME      READY   STATUS    RESTARTS   AGE   LABELS
+ashuweb   1/1     Running   0          35m   x=ashuwebapp
+
+```
+
+### creating service 
+
+```
+kubectl  create service 
+Create a service using specified subcommand.
+
+Aliases:
+service, svc
+
+Available Commands:
+  clusterip    Create a ClusterIP service.
+  externalname Create an ExternalName service.
+  loadbalancer Create a LoadBalancer service.
+  nodeport     Create a NodePort service.
+```
+### my service of nodeport type 
+
+```
+ kubectl  create service  nodeport  ashusvc1 --tcp 1123:80  --dry-run=client  -o yaml  
+apiVersion: v1
+kind: Service
+metadata:
+  creationTimestamp: null
+  labels:
+    app: ashusvc1
+  name: ashusvc1
+spec:
+  ports:
+  - name: 1123-80
+    port: 1123
+    protocol: TCP
+    targetPort: 80
+  selector:
+    app: ashusvc1
+  type: NodePort
+status:
+  loadBalancer: {}
+ fire@ashutoshhs-MacBook-Air  ~/Desktop/k8s_apps  kubectl  create service  nodeport  ashusvc1 --tcp 1123:80  --dry-run=client  -o yaml  >mysvc.yaml
+```
+ ### Nodeport type service done 
+ ```
+  kubectl  get po --show-labels
+NAME      READY   STATUS    RESTARTS   AGE   LABELS
+ashuweb   1/1     Running   0          42m   x=ashuwebapp
+ fire@ashutoshhs-MacBook-Air  ~/Desktop/k8s_apps  kubectl apply -f  mysvc.yaml 
+service/ashusvc1 created
+ fire@ashutoshhs-MacBook-Air  ~/Desktop/k8s_apps  kubectl  get  service       
+NAME       TYPE       CLUSTER-IP      EXTERNAL-IP   PORT(S)          AGE
+ashusvc1   NodePort   10.103.190.18   <none>        1123:31610/TCP   16s
+
+```
+
+### nodeport working 
+<img src="np.png">
+
+
