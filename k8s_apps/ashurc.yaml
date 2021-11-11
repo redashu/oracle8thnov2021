@@ -1,0 +1,36 @@
+apiVersion: v1
+kind: ReplicationController 
+metadata:
+ name: ashu-rc1 # name of RC
+spec: 
+ replicas: 1 # number of pod to start with 
+ template: # RC will be using pod template to create Pod apps 
+  metadata:
+   labels: # label of pod 
+    x1: helloashu1 
+  spec: 
+   containers:
+   - image: dockerashu/nginx:11nov2021
+     name: ashuc1 
+     ports:
+     - containerPort: 80 
+
+# placing service yaml here as well
+---
+apiVersion: v1
+kind: Service
+metadata:
+  creationTimestamp: null
+  labels:
+    app: ashusvc2
+  name: ashusvc2 # name of service 
+spec:
+  ports:
+  - name: 1133-80
+    port: 1133
+    protocol: TCP
+    targetPort: 80
+  selector: # Pod Finder so match label of POd here 
+    x1: helloashu1 # exactly same as label of POD 
+  type: NodePort
+  
