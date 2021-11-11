@@ -1,0 +1,38 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  creationTimestamp: null
+  labels: # label of POD -- key  value 
+    x: ashuwebapp 
+  name: ashuweb # name of pod 
+spec:
+  containers:
+  - image: dockerashu/nginx:11nov2021 # docker image 
+    name: ashuweb # name of container 
+    ports: # container app port number 
+    - containerPort: 80
+    resources: {}
+  dnsPolicy: ClusterFirst
+  restartPolicy: Always
+status: {}
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  creationTimestamp: null
+  labels:
+    app: ashusvc1
+  name: ashusvc1 # name of service 
+spec:
+  ports:
+  - name: 1123-80
+    port: 1123 # loadbalancer port / service port 
+    protocol: TCP
+    targetPort: 80 # app port running in the pod 
+  selector: # Pod Finder where to forward traffic 
+    x: ashuwebapp # this is label of POd that will be find by service 
+  type: NodePort # type of service 
+status:
+  loadBalancer: {}
