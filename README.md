@@ -298,4 +298,164 @@ ashusvc1   NodePort   10.103.190.18   <none>        1123:31610/TCP   16s
 ### nodeport working 
 <img src="np.png">
 
+### problem with pod and solution with RC 
+
+<img src="rc.png">
+
+### RC deploy 
+
+```
+apiVersion: v1
+kind: ReplicationController 
+metadata:
+ name: ashu-rc1 # name of RC
+spec: 
+ replicas: 1 # number of pod to start with 
+ template: # RC will be using pod template to create Pod apps 
+  metadata:
+   labels: # label of pod 
+    x1: helloashu1 
+  spec: 
+   containers:
+   - image: dockerashu/nginx:11nov2021
+     name: ashuc1 
+     ports:
+     - containerPort: 80 
+  
+```
+
+### deploying rc 
+
+```
+kubectl apply -f  ashurc.yaml 
+replicationcontroller/ashu-rc1 created
+service/ashusvc2 created
+ fire@ashutoshhs-MacBook-Air  ~/Desktop/k8s_apps  
+ fire@ashutoshhs-MacBook-Air  ~/Desktop/k8s_apps  kubectl  get  rc
+NAME       DESIRED   CURRENT   READY   AGE
+ashu-rc1   1         1         1       6s
+ fire@ashutoshhs-MacBook-Air  ~/Desktop/k8s_apps  kubectl  get  po  
+NAME             READY   STATUS    RESTARTS   AGE
+ashu-rc1-mrjng   1/1     Running   0          16s
+ fire@ashutoshhs-MacBook-Air  ~/Desktop/k8s_apps  kubectl  get  svc
+NAME       TYPE       CLUSTER-IP      EXTERNAL-IP   PORT(S)          AGE
+ashusvc2   NodePort   10.99.156.211   <none>        1133:32023/TCP   21s
+
+```
+
+### self healing method 
+
+```
+ kubectl  delete  pod ashu-rc1-mrjng
+pod "ashu-rc1-mrjng" deleted
+ fire@ashutoshhs-MacBook-Air  ~/Desktop/k8s_apps  kubectl  get  po                   
+NAME             READY   STATUS    RESTARTS   AGE
+ashu-rc1-dq2rn   1/1     Running   0          5s
+
+```
+
+## scaling pod 
+
+```
+
+ fire@ashutoshhs-MacBook-Air  ~/Desktop/k8s_apps  kubectl scale rc  ashu-rc1 --replicas=3
+replicationcontroller/ashu-rc1 scaled
+ fire@ashutoshhs-MacBook-Air  ~/Desktop/k8s_apps  
+ fire@ashutoshhs-MacBook-Air  ~/Desktop/k8s_apps  kubectl  get  po                       
+NAME             READY   STATUS              RESTARTS   AGE
+ashu-rc1-7zpjj   0/1     ContainerCreating   0          4s
+ashu-rc1-dq2rn   1/1     Running             0          2m41s
+ashu-rc1-pvcqj   0/1     ContainerCreating   0          4s
+```
+### Deletion of all resources in namespace 
+
+```
+kubectl  delete all --all
+pod "ashu-rc1-dq2rn" deleted
+replicationcontroller "ashu-rc1" deleted
+service "ashusvc2" deleted
+```
+
+### creating pod from private docker registry 
+
+```
+kubectl  run  ashuweb111  --image=phx.ocir.io/axmbtg8judkl/oraclewebapp:v1   --port 80  --dry-run=client -o yaml 
+apiVersion: v1
+kind: Pod
+metadata:
+  creationTimestamp: null
+  labels:
+    run: ashuweb111
+  name: ashuweb111
+spec:
+  containers:
+  - image: phx.ocir.io/axmbtg8judkl/oraclewebapp:v1
+    name: ashuweb111
+    ports:
+    - containerPort: 80
+    resources: {}
+  dnsPolicy: ClusterFirst
+  restartPolicy: Always
+status: {}
+ fire@ashutoshhs-MacBook-Air  ~/Desktop/k8s_apps  kubectl  run  ashuweb111  --image=phx.ocir.io/axmbtg8judkl/oraclewebapp:v1   --port 80  --dry-run=client -o yaml  >privateapp.yml
+```
+
+### introduction to secret in k8s 
+
+<img src="sec.png">
+
+### creating secret 
+
+```
+kubectl  create  secret 
+Create a secret using specified subcommand.
+
+Available Commands:
+  docker-registry Create a secret for use with a Docker registry
+  generic         Create a secret from a local file, directory or literal value
+  tls             Create a TLS secret
+
+Usage:
+```
+### creating 
+
+```
+kubectl  create  secret  docker-registry  ocrsec  --docker-server=phx.ocir.io  --docker-username=axmdkl/learntechbyme@gmail.com     --docker-password=").fMCd1>t[sEDO"
+
+kubectl  get  secret 
+NAME                  TYPE                                  DATA   AGE
+default-token-gsqhm   kubernetes.io/service-account-token   3      4h51m
+ocrsec                kubernetes.io/dockerconfigjson        1      7s
+```
+
+### replace with secret details 
+
+```
+kubectl replace -f  privateapp.yml --force
+pod "ashuweb111" deleted
+pod/ashuweb111 replaced
+ fire@ashutoshhs-MacBook-Air  ~/Desktop/k8s_apps  kubectl  get  po 
+NAME         READY   STATUS    RESTARTS   AGE
+ashuweb111   1/1     Running   0          16s
+```
+
+### auto create service using pod 
+```
+ kubectl  get  po --show-labels
+NAME         READY   STATUS    RESTARTS   AGE   LABELS
+ashuweb111   1/1     Running   0          90s   run=ashuweb111
+ fire@ashutoshhs-MacBook-Air  ~/Desktop/k8s_apps  kubectl  expose pod ashuweb111  --type NodePort --port 80 --name svc4 
+service/svc4 exposed
+ fire@ashutoshhs-MacBook-Air  ~/Desktop/k8s_apps  kubectl  get  svc
+NAME   TYPE       CLUSTER-IP      EXTERNAL-IP   PORT(S)        AGE
+svc4   NodePort   10.107.58.130   <none>        80:30051/TCP   9s
+ fire@ashutoshhs-MacBook-Air  ~/Desktop/k8s_apps  kubectl  get  svc -o wide
+NAME   TYPE       CLUSTER-IP      EXTERNAL-IP   PORT(S)        AGE   SELECTOR
+svc4   NodePort   10.107.58.130   <none>        80:30051/TCP   67s   run=ashuweb111
+```
+
+
+
+
+
 
