@@ -454,6 +454,53 @@ NAME   TYPE       CLUSTER-IP      EXTERNAL-IP   PORT(S)        AGE   SELECTOR
 svc4   NodePort   10.107.58.130   <none>        80:30051/TCP   67s   run=ashuweb111
 ```
 
+### introduction to deployment 
+<img src="dep.png">
+
+### creating deployment 
+
+```
+kubectl  create  deployment ashudep111 --image=dockerashu/nginx:11nov2021   --dry-run=client -o yaml   >deployment.yaml
+```
+
+### 
+
+```
+kubectl apply -f deployment.yaml 
+deployment.apps/ashudep111 created
+ fire@ashutoshhs-MacBook-Air  ~/Desktop/k8s_apps  kubectl  get deployment 
+NAME         READY   UP-TO-DATE   AVAILABLE   AGE
+ashudep111   1/1     1            1           6s
+ fire@ashutoshhs-MacBook-Air  ~/Desktop/k8s_apps  kubectl  get deploy     
+NAME         READY   UP-TO-DATE   AVAILABLE   AGE
+ashudep111   1/1     1            1           9s
+ fire@ashutoshhs-MacBook-Air  ~/Desktop/k8s_apps  kubectl  get  po   
+NAME                          READY   STATUS    RESTARTS   AGE
+ashudep111-6bd458b897-jhkfq   1/1     Running   0          15s
+ fire@ashutoshhs-MacBook-Air  ~/Desktop/k8s_apps  kubectl expose deployment ashudep111  --type NodePort   --port 80  --name  ashusvc333 
+service/ashusvc333 exposed
+ fire@ashutoshhs-MacBook-Air  ~/Desktop/k8s_apps  kubectl  get  svc 
+NAME         TYPE       CLUSTER-IP       EXTERNAL-IP   PORT(S)        AGE
+ashusvc333   NodePort   10.110.121.200   <none>        80:32311/TCP   5s
+
+```
+
+### manual scaling in deployment 
+
+```
+kubectl  scale  deployment ashudep111 --replicas=3
+deployment.apps/ashudep111 scaled
+ fire@ashutoshhs-MacBook-Air  ~/Desktop/k8s_apps  kubectl  get po
+NAME                          READY   STATUS    RESTARTS   AGE
+ashudep111-6bd458b897-7hvvp   1/1     Running   0          4s
+ashudep111-6bd458b897-jhkfq   1/1     Running   0          2m46s
+ashudep111-6bd458b897-ldcxd   1/1     Running   0          4s
+
+```
+
+### never ever use minion ip to access app 
+
+<img src="extlb.png">
 
 
 
