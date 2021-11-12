@@ -307,4 +307,82 @@ ashupod1   NodePort   10.107.148.84   <none>        80:31500/TCP   6s
 
 ```
 
+### Dashboard deployment in k8s cluster 
+
+## 
+
+```
+kubectl apply -f https://raw.githubusercontent.com/kubernetes/dashboard/v2.4.0/aio/deploy/recommended.yaml
+namespace/kubernetes-dashboard created
+serviceaccount/kubernetes-dashboard created
+service/kubernetes-dashboard created
+secret/kubernetes-dashboard-certs created
+secret/kubernetes-dashboard-csrf created
+secret/kubernetes-dashboard-key-holder created
+configmap/kubernetes-dashboard-settings created
+role.rbac.authorization.k8s.io/kubernetes-dashboard created
+clusterrole.rbac.authorization.k8s.io/kubernetes-dashboard unchanged
+rolebinding.rbac.authorization.k8s.io/kubernetes-dashboard created
+clusterrolebinding.rbac.authorization.k8s.io/kubernetes-dashboard unchanged
+deployment.apps/kubernetes-dashboard created
+service/dashboard-metrics-scraper created
+deployment.apps/dashboard-metrics-scraper created
+
+```
+
+### checking details 
+
+```
+kubectl  get  deploy -n kubernetes-dashboard 
+NAME                        READY   UP-TO-DATE   AVAILABLE   AGE
+dashboard-metrics-scraper   1/1     1            1           52s
+kubernetes-dashboard        1/1     1            1           54s
+ fire@ashutoshhs-MacBook-Air  ~/Desktop/k8s_apps  kubectl  get  po -n kubernetes-dashboard 
+NAME                                        READY   STATUS    RESTARTS   AGE
+dashboard-metrics-scraper-c45b7869d-q999q   1/1     Running   0          68s
+kubernetes-dashboard-576cb95f94-vh7xh       1/1     Running   0          70s
+ fire@ashutoshhs-MacBook-Air  ~/Desktop/k8s_apps  kubectl  get  svc -n kubernetes-dashboard 
+NAME                        TYPE        CLUSTER-IP       EXTERNAL-IP   PORT(S)    AGE
+dashboard-metrics-scraper   ClusterIP   10.111.255.215   <none>        8000/TCP   79s
+kubernetes-dashboard        ClusterIP   10.103.80.106    <none>        443/TCP    87s
+ fire@ashutoshhs-MacBook-Air  ~/Desktop/k8s_apps  kubectl  get  secret  -n kubernetes-dashboard 
+NAME                               TYPE                                  DATA   AGE
+default-token-bqxpt                kubernetes.io/service-account-token   3      103s
+kubernetes-dashboard-certs         Opaque                                0      101s
+kubernetes-dashboard-csrf          Opaque                                1      100s
+kubernetes-dashboard-key-holder    Opaque                                2      99s
+kubernetes-dashboard-token-jgqj7   kubernetes.io/service-account-token   3      102s
+
+```
+
+### changing service 
+
+```
+ kubectl  edit  svc  kubernetes-dashboard        -n kubernetes-dashboard 
+service/kubernetes-dashboard edited
+ fire@ashutoshhs-MacBook-Air  ~/Desktop/k8s_apps  kubectl  get  svc -n kubernetes-dashboard                           
+NAME                        TYPE        CLUSTER-IP       EXTERNAL-IP   PORT(S)         AGE
+dashboard-metrics-scraper   ClusterIP   10.111.255.215   <none>        8000/TCP        2m38s
+kubernetes-dashboard        NodePort    10.103.80.106    <none>        443:32704/TCP   2m46s
+```
+### giving permission to dashboard to access cluster data 
+
+```
+kubectl create  clusterrolebinding  dashboardaccess  --clusterrole=cluster-admin    --serviceaccount=kubernetes-dashboard:kubernetes-dashboard
+```
+
+### Dashboard in Minikube based k8s cluster 
+
+```
+minikube dashboard  --url
+🤔  Verifying dashboard health ...
+🚀  Launching proxy ...
+🤔  Verifying proxy health ...
+http://127.0.0.1:52305/api/v1/namespaces/kubernetes-dashboard/services/http:kubernetes-dashboard:/proxy/
+
+
+
+```
+
+
 
