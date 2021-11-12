@@ -1,0 +1,120 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  creationTimestamp: null
+  labels:
+    app: ashudb
+  name: ashudb # name of Db deployment 
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: ashudb
+  strategy: {}
+  template: # tempalte section 
+    metadata:
+      creationTimestamp: null
+      labels:
+        app: ashudb
+    spec:
+      volumes: # to create volume 
+      - name: ashudbvol 
+        nfs: # taking storage from NFS server 
+         server: 172.31.17.159
+         path: /data/ashu/ # plz user your name only
+      containers:
+      - image: mysql:5.6
+        name: mysql
+        volumeMounts: # mounting volume to default db location 
+        - name: ashudbvol
+          mountPath: /var/lib/mysql/
+        env: # to create or  use ENv variable 
+        - name: MYSQL_ROOT_PASSWORD # name of env var to setup root password 
+          valueFrom: # calling value 
+           secretKeyRef: # using secret 
+            name: mysec # name of secret 
+            key: pass1 # key of secret 
+        resources: {}
+status: {}
+
+# creating secret to store db password 
+---
+apiVersion: v1
+data:
+  pass1: T3JhY2xlZGIwODg= # original password will be encoded 
+kind: Secret
+metadata:
+  creationTimestamp: null
+  name: mysec # name of secret 
+
+# service of clusterIP type for DB 
+---
+apiVersion: v1
+kind: Service
+metadata:
+  creationTimestamp: null
+  labels:
+    app: ashudb
+  name: ashudb
+spec:
+  ports:
+  - port: 3306
+    protocol: TCP
+    targetPort: 3306
+  selector:
+    app: ashudb
+  type: ClusterIP
+status:
+  loadBalancer: {}
+
+# creating webapp for frontend app
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  creationTimestamp: null
+  labels:
+    app: ashuwebapp
+  name: ashuwebapp
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: ashuwebapp
+  strategy: {}
+  template: # to creating POD 
+    metadata:
+      creationTimestamp: null
+      labels: # label of pod 
+        app: ashuwebapp
+    spec:
+      containers:
+      - image: wordpress:4.8-apache
+        name: wordpress
+        env: # to connect this webapp to target 
+        - name: WORDPRESS_DB_HOST # host/ip of wordpress db 
+          value: ashudb # service name of DB 
+        - name: WORDPRESS_DB_PASSWORD
+          valueFrom:
+           secretKeyRef:
+            name: mysec
+            key: pass1
+        resources: {}
+
+# nodeport service for webapp
+---
+apiVersion: v1
+kind: Service
+metadata:
+  creationTimestamp: null
+  labels:
+    app: ashuwebapp
+  name: ashuwebapp
+spec:
+  ports:
+  - port: 80
+    protocol: TCP
+    targetPort: 80
+  selector:
+    app: ashuwebapp
+  type: NodePort
