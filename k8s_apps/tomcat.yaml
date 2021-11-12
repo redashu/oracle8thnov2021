@@ -1,0 +1,26 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  creationTimestamp: null
+  labels:
+    app: tomcatapp
+  name: tomcatapp # name of deployment 
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: tomcatapp
+  strategy: {}
+  template: # deployment will be using template to create pod 
+    metadata:
+      creationTimestamp: null
+      labels: # label of pod 
+        app: tomcatapp
+    spec:
+      containers:
+      - image: dockerashu/tomcat:v0011
+        name: tomcat
+        ports: # this part is optional 
+        - containerPort: 8080 
+        resources: {}
+status: {}

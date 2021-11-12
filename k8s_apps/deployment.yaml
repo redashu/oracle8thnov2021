@@ -1,0 +1,25 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  creationTimestamp: null
+  labels:
+    app: ashudep111
+  name: ashudep111 # name of deployment 
+  namespace: ashu-space # namespace info 
+spec:
+  replicas: 1 # number of pod we want 
+  selector:
+    matchLabels:
+      app: ashudep111
+  strategy: {}
+  template: # template to create pod 
+    metadata:
+      creationTimestamp: null
+      labels: # label of pod 
+        app: ashudep111
+    spec:
+      containers:
+      - image: dockerashu/nginx:11nov2021 # docker image 
+        name: nginx # name of container 
+        resources: {}
+status: {}
