@@ -383,6 +383,131 @@ http://127.0.0.1:52305/api/v1/namespaces/kubernetes-dashboard/services/http:kube
 
 
 ```
+## k8s External storage with NFS for Db pod 
+
+<img src="db.png">
+
+## Creating app stack --
+### DB yaml 
+
+```
+kubectl create  deployment  ashudb --image=mysql:5.6 --dry-run=client -o yaml   >ashuapp.yaml
+
+```
+
+### deploy DB deployment 
+
+```
+kubectl apply -f ashuapp.yaml 
+deployment.apps/ashudb created
+secret/mysec created
+ fire@ashutoshhs-MacBook-Air  ~/Desktop/k8s_apps  kubectl  get  secrets 
+NAME                  TYPE                                  DATA   AGE
+default-token-gsqhm   kubernetes.io/service-account-token   3      27h
+mysec                 Opaque                                1      7s
+ocrsec                kubernetes.io/dockerconfigjson        1      22h
+ fire@ashutoshhs-MacBook-Air  ~/Desktop/k8s_apps  kubectl  get  deploy  
+NAME     READY   UP-TO-DATE   AVAILABLE   AGE
+ashudb   1/1     1            1           18s
+ fire@ashutoshhs-MacBook-Air  ~/Desktop/k8s_apps  kubectl  get  po    
+NAME                      READY   STATUS    RESTARTS   AGE
+ashudb-6f5f9cd5db-7zdc9   1/1     Running   0          24s
+
+```
+
+### creating service 
+
+```
+kubectl  expose deployment  ashudb  --type ClusterIP --port 3306 --dry-run=client -o yaml 
+apiVersion: v1
+kind: Service
+metadata:
+  creationTimestamp: null
+  labels:
+    app: ashudb
+  name: ashudb
+spec:
+  ports:
+  - port: 3306
+    protocol: TCP
+    targetPort: 3306
+  selector:
+    app: ashudb
+  type: ClusterIP
+status:
+  loadBalancer: {}
+
+```
+
+### clusterIP type service 
+
+```
+kubectl apply -f ashuapp.yaml 
+deployment.apps/ashudb configured
+secret/mysec configured
+service/ashudb created
+ fire@ashutoshhs-MacBook-Air  ~/Desktop/k8s_apps  kubectl  get svc
+NAME     TYPE        CLUSTER-IP      EXTERNAL-IP   PORT(S)    AGE
+ashudb   ClusterIP   10.98.240.184   <none>        3306/TCP   12s
+
+```
+
+### wordpress 
+```
+kubectl create deployment  ashuwebapp --image=wordpress:4.8-apache --dry-run=client -o yaml 
+
+```
+
+### wordpress db host 
+
+```
+ kubectl apply -f  ashuapp.yaml 
+deployment.apps/ashudb configured
+secret/mysec configured
+service/ashudb configured
+deployment.apps/ashuwebapp created
+ fire@ashutoshhs-MacBook-Air  ~/Desktop/k8s_apps  kubectl  get deploy 
+NAME         READY   UP-TO-DATE   AVAILABLE   AGE
+ashudb       1/1     1            1           20m
+ashuwebapp   0/1     1            0           6s
+ fire@ashutoshhs-MacBook-Air  ~/Desktop/k8s_apps  kubectl  get deploy 
+NAME         READY   UP-TO-DATE   AVAILABLE   AGE
+ashudb       1/1     1            1           20m
+ashuwebapp   0/1     1            0           10s
+ fire@ashutoshhs-MacBook-Air  ~/Desktop/k8s_apps  kubectl  get  po    
+NAME                          READY   STATUS              RESTARTS   AGE
+ashudb-6f5f9cd5db-7zdc9       1/1     Running             0          21m
+ashuwebapp-85bc9d67bb-rmc4l   0/1     ContainerCreating   0          15s
+ fire@ashutoshhs-MacBook-Air  ~/Desktop/k8s_apps  kubectl  get  po
+NAME                          READY   STATUS    RESTARTS   AGE
+ashudb-6f5f9cd5db-7zdc9       1/1     Running   0          21m
+ashuwebapp-85bc9d67bb-rmc4l   1/1     Running   0          26s
+ fire@ashutoshhs-MacBook-Air  ~/Desktop/k8s_apps  
 
 
+```
+
+### Exposing db 
+
+```
+fire@ashutoshhs-MacBook-Air  ~/Desktop/k8s_apps  kubectl expose deploy  ashuwebapp --type NodePort  --port 80 --dry-run=client -o yaml 
+apiVersion: v1
+kind: Service
+metadata:
+  creationTimestamp: null
+  labels:
+    app: ashuwebapp
+  name: ashuwebapp
+spec:
+  ports:
+  - port: 80
+    protocol: TCP
+    targetPort: 80
+  selector:
+    app: ashuwebapp
+  type: NodePort
+status:
+  loadBalancer: {}
+
+```
 
