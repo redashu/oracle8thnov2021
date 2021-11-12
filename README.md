@@ -136,6 +136,29 @@ deployment "tomcatapp" successfully rolled out
 
 ```
 
+## horizental pod autoscaler (HPA)
+
+<img src="hpa.png">
+
+### putting limit in cpu 
+
+<img src="cpul.png">
+
+### implementing hpa 
+
+```
+ kubectl  get  hpa
+NAME        REFERENCE              TARGETS   MINPODS   MAXPODS   REPLICAS   AGE
+tomcatapp   Deployment/tomcatapp   1%/80%    3         10        3          32s
+ fire@ashutoshhs-MacBook-Air  ~/Desktop/k8s_apps  kubectl  get po 
+NAME                         READY   STATUS    RESTARTS   AGE
+tomcatapp-66566c6976-kbbds   1/1     Running   0          2m15s
+tomcatapp-66566c6976-sn7p2   1/1     Running   0          27s
+tomcatapp-66566c6976-vhztr   1/1     Running   0          27s
+ fire@ashutoshhs-MacBook-Air  ~/Desktop/k8s_apps  kubectl  get  hpa
+NAME        REFERENCE              TARGETS   MINPODS   MAXPODS   REPLICAS   AGE
+tomcatapp   Deployment/tomcatapp   1%/80%    3         10        3          51s
+```
 
 
 
