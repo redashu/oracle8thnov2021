@@ -7,7 +7,7 @@ metadata:
   name: ashusvc1 # name of service 
 spec:
   ports:
-  - name: 1123-80
+  - name: c1traffic 
     port: 1123 # loadbalancer port / service port 
     protocol: TCP
     targetPort: 80 # app port running in the pod 
